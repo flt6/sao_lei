@@ -2,9 +2,12 @@ import random
 import os
 from functools import lru_cache
 
-arr_out = [["*" for i in range(9)] for i in range(9)]
-arr_in = [[0 for i in range(9)] for i in range(9)]
-arr_tem = [[0 for i in range(9)] for i in range(9)]
+N = 9
+LEI = 10
+arr_out = [["*" for i in range(N)] for i in range(N)]
+arr_in = [[0 for i in range(N)] for i in range(N)]
+arr_tem = [[0 for i in range(N)] for i in range(N)]
+arr_bj = [[0 for i in range(N)] for i in range(N)]
 
 
 def showed(x, y):
@@ -12,21 +15,21 @@ def showed(x, y):
 
 
 def not_out(x, y):
-    return x >= 0 and x < 9 and y >= 0 and y < 9
+    return x >= 0 and x < N and y >= 0 and y < N
 
 
 def init():
     global arr_in, arr_out
     count = 0
-    while count < 10:
-        x = random.randint(0, 8)
-        y = random.randint(0, 8)
+    while count < LEI:
+        x = random.randint(0, N - 1)
+        y = random.randint(0, N - 1)
         if arr_in[y][x] == 1:
             continue
         arr_in[y][x] = 1
         count += 1
-    for i in range(9):
-        for j in range(9):
+    for i in range(N):
+        for j in range(N):
             jx(i, j)
 
 
@@ -34,7 +37,7 @@ def jx(x, y):
     global arr_tem, arr_in
     count = 0
     if arr_in[y][x] == 1:
-        arr_tem[y][x] = 9
+        arr_tem[y][x] = -1
         return
     if not_out(x, y + 1) and arr_in[y + 1][x] == 1:
         count += 1
@@ -56,16 +59,18 @@ def jx(x, y):
 
 
 def show(arr):
-    for i in range(0, 10):
-        print(i, end=' ')
+    for i in range(0, N + 1):
+        print("\33[1;32m{}\33[0m".format(i), end=' ')
     print()
-    for i in range(9):
-        print(i + 1, end=' ')
-        for j in arr[i]:
-            if j == 0:
-                print(" ", end=" ")
+    for i in range(N):
+        print("\33[1;32m{}\33[0m".format(i + 1), end=' ')
+        for j in range(len(arr[i])):
+            if arr_bj[j][i] == 1:
+                print("\33[1;31m{}\33[0m".format(arr[j][i]), end=" ")
+            elif arr_bj[j][i] == 2:
+                print("\33[1;33m{}\33[0m".format(arr[j][i]), end=" ")
             else:
-                print(j, end=' ')
+                print(arr[j][i], end=' ')
         print()
 
 
@@ -111,8 +116,8 @@ def zk(x, y):
 
 
 def check():
-    for i in range(9):
-        for j in range(9):
+    for i in range(N):
+        for j in range(N):
             if arr_out[i][j] == '*' and arr_in[i][j] != 1:
                 return False
     return True
@@ -126,8 +131,24 @@ def play():
         os.system("pause")
         os.system("cls")
         show(arr_out)
+        print()
+        show(arr_in)
         ipt_x, ipt_y = input("x y:").split()
         ipt_x, ipt_y = int(ipt_x) - 1, int(ipt_y) - 1
+
+        arr_bj[ipt_y][ipt_x] = 2
+        os.system("cls")
+        show(arr_out)
+        print()
+        show(arr_in)
+        print("x y:{} {}".format(ipt_x + 1, ipt_y + 1))
+        try:
+            what = int(input("展开1 标记2 取消3:"))
+        except ValueError:
+            print("输入错误！")
+            continue
+        arr_bj[ipt_y][ipt_x] = 0
+
         # ---input err---
         if ipt_x == -2 or ipt_y == -2:
             print("退出。")
@@ -135,10 +156,20 @@ def play():
         elif not(not_out(ipt_x, ipt_y)):
             print("输入出界!")
             continue
-        elif arr_out[ipt_y][ipt_x] != '*':
+        elif what < 1 or what > 3:
+            print("执行类型错误！")
+            continue
+        elif what == 3:
+            print("取消！")
+            continue
+        elif what == 2:
+            arr_bj[ipt_y][ipt_x] = 1
+            print("标记成功！")
+            continue
+        elif arr_out[ipt_y][ipt_x] != '*' and what == 1:
             print("已展开！")
             continue
-        elif arr_in[ipt_y][ipt_x] == 1:
+        elif arr_in[ipt_y][ipt_x] == 1 and what == 1:
             print("你输了！")
             show(arr_in)
             break
