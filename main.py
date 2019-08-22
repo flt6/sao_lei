@@ -1,6 +1,8 @@
 import random
 import os
+import threading
 from functools import lru_cache
+from socket import *
 
 N = 9
 LEI = 10
@@ -8,6 +10,7 @@ arr_out = [["*" for i in range(N)] for i in range(N)]
 arr_in = [[0 for i in range(N)] for i in range(N)]
 arr_tem = [[0 for i in range(N)] for i in range(N)]
 arr_bj = [[0 for i in range(N)] for i in range(N)]
+s = socket()
 
 
 def showed(x, y):
@@ -123,24 +126,44 @@ def check():
     return True
 
 
+def sock():
+    global arr_bj, arr_in, arr_out, arr_tem, s
+    s.bind(("127.0.0.1", 6306))
+    s.listen(1)
+    while True:
+        s1, _ = s.accept()
+        t = threading.Thread(target=sock_1, args=(s1,))
+        t.setDaemon(True)
+        t.start()
+
+
+def sock_1(s1):
+    while True:
+        data = s1.recv(1024).decode()
+        if data == "@bye@":
+            s1.send("@bye@".encode())
+            return
+        else:
+            exec(data)
+
+
 def play():
     global arr_out, arr_in
     ipt_x = 0
     ipt_y = 0
+    t = threading.Thread(target=sock)
+    t.setDaemon(True)
+    t.start()
     while True:
         os.system("pause")
         os.system("cls")
         show(arr_out)
-        print()
-        show(arr_in)
         ipt_x, ipt_y = input("x y:").split()
         ipt_x, ipt_y = int(ipt_x) - 1, int(ipt_y) - 1
 
         arr_bj[ipt_y][ipt_x] = 2
         os.system("cls")
         show(arr_out)
-        print()
-        show(arr_in)
         print("x y:{} {}".format(ipt_x + 1, ipt_y + 1))
         try:
             what = int(input("展开1 标记2 取消3:"))
