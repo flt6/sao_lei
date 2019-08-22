@@ -99,7 +99,6 @@ def zk(x, y):
     if not_out(x, y - 1) and arr_tem[y - 1][x] == 0 and not(showed(x, y - 1)):
         zk(x, y - 1)
 
-    # pdb.set_trace()
     if not_out(x, y + 1) and arr_tem[y + 1][x] != -1:
         arr_out[y + 1][x] = arr_tem[y + 1][x]
     if not_out(x + 1, y + 1) and arr_tem[y + 1][x + 1] != -1:
