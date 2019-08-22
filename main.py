@@ -1,16 +1,16 @@
 import random
 import os
 import threading
-from functools import lru_cache
 from socket import *
 
-N = 9
-LEI = 10
+N = 16
+LEI = 40
 arr_out = [["*" for i in range(N)] for i in range(N)]
 arr_in = [[0 for i in range(N)] for i in range(N)]
-arr_tem = [[0 for i in range(N)] for i in range(N)]
+arr_push = [[0 for i in range(N)] for i in range(N)]
 arr_bj = [[0 for i in range(N)] for i in range(N)]
 s = socket()
+reload = False
 
 
 def showed(x, y):
@@ -31,17 +31,29 @@ def init():
             continue
         arr_in[y][x] = 1
         count += 1
-    for i in range(N):
-        for j in range(N):
-            jx(i, j)
 
 
-def jx(x, y):
-    global arr_tem, arr_in
+def show(arr):
+    global N
+    for i in range(0, N + 1):
+        print("\33[1;32m{:^2}\33[0m".format(i), end=' ')
+    print()
+    for i in range(0,N):
+        print("\33[1;32m{:^2}\33[0m".format(i + 1), end=' ')
+        for j in range(0,N):
+            if arr_bj[j][i] == 1:
+                print("\33[1;31m{:^2}\33[0m".format(arr[j][i]), end=" ")
+            elif arr_bj[j][i] == 2:
+                print("\33[1;33m{:^2}\33[0m".format(arr[j][i]), end=" ")
+            elif arr[j][i] == 0:
+                print("{:^2}".format('░'), end=' ')
+            else:
+                print("{:^2}".format(arr[j][i]), end=' ')
+        print()
+
+
+def get(x, y):
     count = 0
-    if arr_in[y][x] == 1:
-        arr_tem[y][x] = -1
-        return
     if not_out(x, y + 1) and arr_in[y + 1][x] == 1:
         count += 1
     if not_out(x + 1, y + 1) and arr_in[y + 1][x + 1] == 1:
@@ -58,63 +70,56 @@ def jx(x, y):
         count += 1
     if not_out(x, y - 1) and arr_in[y - 1][x] == 1:
         count += 1
-    arr_tem[y][x] = count
+    return count
 
 
-def show(arr):
-    for i in range(0, N + 1):
-        print("\33[1;32m{}\33[0m".format(i), end=' ')
-    print()
-    for i in range(N):
-        print("\33[1;32m{}\33[0m".format(i + 1), end=' ')
-        for j in range(len(arr[i])):
-            if arr_bj[j][i] == 1:
-                print("\33[1;31m{}\33[0m".format(arr[j][i]), end=" ")
-            elif arr_bj[j][i] == 2:
-                print("\33[1;33m{}\33[0m".format(arr[j][i]), end=" ")
-            else:
-                print(arr[j][i], end=' ')
-        print()
+def check01(x, y, n=0):
+    return not_out(x, y) and arr_in[y][x] == n and not(showed(x, y))
 
 
-@lru_cache()
+def zk01(x, y):
+    if check01(x, y + 1):
+        arr_out[y + 1][x] = get(x, y + 1)
+    if check01(x + 1, y):
+        arr_out[y][x + 1] = get(x + 1, y)
+    if check01(x - 1, y):
+        arr_out[y][x - 1] = get(x - 1, y)
+    if check01(x, y - 1):
+        arr_out[y - 1][x] = get(x, y - 1)
+
+    if check01(x + 1, y - 1):
+        arr_out[y - 1][x + 1] = get(x + 1, y - 1)
+    if check01(x - 1, y - 1):
+        arr_out[y - 1][x - 1] = get(x - 1, y - 1)
+    if check01(x - 1, y + 1):
+        arr_out[y + 1][x - 1] = get(x - 1, y + 1)
+    if check01(x + 1, y + 1):
+        arr_out[y + 1][x + 1] = get(x + 1, y + 1)
+
+
 def zk(x, y):
     global arr_in, arr_out
-    arr_out[y][x] = arr_tem[y][x]
-
-    if not_out(x, y + 1) and arr_tem[y + 1][x] == 0 and not(showed(x, y + 1)):
-        zk(x, y + 1)
-    if not_out(x + 1, y + 1) and arr_tem[y + 1][x + 1] == 0 and not(showed(x + 1, y + 1)):
-        zk(x + 1, y + 1)
-    if not_out(x - 1, y + 1) and arr_tem[y + 1][x - 1] == 0 and not(showed(x - 1, y + 1)):
-        zk(x - 1, y + 1)
-    if not_out(x + 1, y) and arr_tem[y][x + 1] == 0 and not(showed(x + 1, y)):
-        zk(x + 1, y)
-    if not_out(x + 1, y - 1) and arr_tem[y - 1][x + 1] == 0 and not(showed(x + 1, y - 1)):
-        zk(x + 1, y - 1)
-    if not_out(x - 1, y - 1) and arr_tem[y - 1][x - 1] == 0 and not(showed(x - 1, y - 1)):
-        zk(x - 1, y - 1)
-    if not_out(x - 1, y) and arr_tem[y][x - 1] == 0 and not(showed(x - 1, y)):
-        zk(x - 1, y)
-    if not_out(x, y - 1) and arr_tem[y - 1][x] == 0 and not(showed(x, y - 1)):
-        zk(x, y - 1)
-
-    if not_out(x, y + 1) and arr_tem[y + 1][x] != -1:
-        arr_out[y + 1][x] = arr_tem[y + 1][x]
-    if not_out(x + 1, y + 1) and arr_tem[y + 1][x + 1] != -1:
-        arr_out[y + 1][x + 1] = arr_tem[y + 1][x + 1]
-    if not_out(x - 1, y + 1) and arr_tem[y + 1][x - 1] != -1:
-        arr_out[y + 1][x - 1] = arr_tem[y + 1][x - 1]
-    if not_out(x + 1, y) and arr_tem[y][x + 1] != -1:
-        arr_out[y][x + 1] = arr_tem[y][x + 1]
-    if not_out(x + 1, y - 1) and arr_tem[y - 1][x + 1] != -1:
-        arr_out[y - 1][x + 1] = arr_tem[y - 1][x + 1]
-    if not_out(x - 1, y - 1) and arr_tem[y - 1][x - 1] != -1:
-        arr_out[y - 1][x - 1] = arr_tem[y - 1][x - 1]
-    if not_out(x - 1, y) and arr_tem[y][x - 1] != -1:
-        arr_out[y][x - 1] = arr_tem[y][x - 1]
-    if not_out(x, y - 1) and arr_tem[y - 1][x] != -1:
-        arr_out[y - 1][x] = arr_tem[y - 1][x]
+    arr_out[y][x] = get(x, y)
+    push = True
+    while push:
+        push = False
+        for i in range(N):
+            for j in range(N):
+                if showed(i, j) and arr_push[j][i] == 0 and arr_out[j][i] == 0:
+                    arr_push[j][i] = 1
+                    push = True
+                    if check01(i + 1, j) and arr_push[j][i + 1] == 0:
+                        arr_out[j][i + 1] = get(i + 1, j)
+                        zk01(i + 1, j)
+                    if check01(i - 1, j) and arr_push[j][i - 1] == 0:
+                        arr_out[j][i - 1] = get(i - 1, j)
+                        zk01(i - 1, j)
+                    if check01(i, j + 1) and arr_push[j + 1][i] == 0:
+                        arr_out[j + 1][i] = get(i, j + 1)
+                        zk01(i, j + 1)
+                    if check01(i, j - 1) and arr_push[j - 1][i] == 0:
+                        arr_out[j - 1][i] = get(i, j - 1)
+                        zk01(i, j - 1)
 
 
 def check():
@@ -126,8 +131,8 @@ def check():
 
 
 def sock():
-    global arr_bj, arr_in, arr_out, arr_tem, s
-    s.bind(("127.0.0.1", 6306))
+    global arr_bj, arr_in, arr_out, arr_push, s
+    s.bind(("192.168.124.6", 6306))
     s.listen(1)
     while True:
         s1, _ = s.accept()
@@ -137,8 +142,9 @@ def sock():
 
 
 def sock_1(s1):
+    global arr_in, arr_out, arr_push, arr_bj, reload
     while True:
-        data = s1.recv(1024).decode()
+        data = s1.recv(10000).decode()
         if data == "@bye@":
             s1.send("@bye@".encode())
             return
@@ -147,19 +153,18 @@ def sock_1(s1):
 
 
 def play():
-    global arr_out, arr_in
+    global arr_out, arr_in, reload
     ipt_x = 0
     ipt_y = 0
-    t = threading.Thread(target=sock)
-    t.setDaemon(True)
-    t.start()
     while True:
         os.system("pause")
         os.system("cls")
         show(arr_out)
-        ipt_x, ipt_y = input("x y:").split()
-        ipt_x, ipt_y = int(ipt_x) - 1, int(ipt_y) - 1
-
+        try:
+            ipt_x, ipt_y = input("x y:").split()
+            ipt_x, ipt_y = int(ipt_x) - 1, int(ipt_y) - 1
+        except Exception:
+            print("输入错误！")
         arr_bj[ipt_y][ipt_x] = 2
         os.system("cls")
         show(arr_out)
@@ -206,7 +211,23 @@ def play():
             break
         else:
             print("操作成功！")
+        if reload:
+            break
 
+
+t = threading.Thread(target=sock)
+t.setDaemon(True)
+t.start()
 
 init()
-play()
+# init_from_file()
+while True:
+    play()
+    print("reload!")
+    if not(reload):
+        print("\n\n\n")
+        ipt = input("是否继续(YES/no):")
+        if ipt == "no":
+            break
+    else:
+        reload = False
