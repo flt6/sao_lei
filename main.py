@@ -1,6 +1,5 @@
 import random
 import os
-import pdb
 from functools import lru_cache
 
 arr_out = [["*" for i in range(9)] for i in range(9)]
@@ -63,7 +62,10 @@ def show(arr):
     for i in range(9):
         print(i + 1, end=' ')
         for j in arr[i]:
-            print(j, end=' ')
+            if j == 0:
+                print(" ", end=" ")
+            else:
+                print(j, end=' ')
         print()
 
 
@@ -89,22 +91,22 @@ def zk(x, y):
     if not_out(x, y - 1) and arr_tem[y - 1][x] == 0 and not(showed(x, y - 1)):
         zk(x, y - 1)
 
-    pdb.set_trace()
-    if not_out(x, y + 1) and arr_tem[y + 1][x] == 0:
+    # pdb.set_trace()
+    if not_out(x, y + 1) and arr_tem[y + 1][x] != -1:
         arr_out[y + 1][x] = arr_tem[y + 1][x]
-    if not_out(x + 1, y + 1) and arr_tem[y + 1][x + 1] == 0:
+    if not_out(x + 1, y + 1) and arr_tem[y + 1][x + 1] != -1:
         arr_out[y + 1][x + 1] = arr_tem[y + 1][x + 1]
-    if not_out(x - 1, y + 1) and arr_tem[y + 1][x - 1] == 0:
+    if not_out(x - 1, y + 1) and arr_tem[y + 1][x - 1] != -1:
         arr_out[y + 1][x - 1] = arr_tem[y + 1][x - 1]
-    if not_out(x + 1, y) and arr_tem[y][x + 1] == 0:
+    if not_out(x + 1, y) and arr_tem[y][x + 1] != -1:
         arr_out[y][x + 1] = arr_tem[y][x + 1]
-    if not_out(x + 1, y - 1) and arr_tem[y - 1][x + 1] == 0:
+    if not_out(x + 1, y - 1) and arr_tem[y - 1][x + 1] != -1:
         arr_out[y - 1][x + 1] = arr_tem[y - 1][x + 1]
-    if not_out(x - 1, y - 1) and arr_tem[y - 1][x - 1] == 0:
+    if not_out(x - 1, y - 1) and arr_tem[y - 1][x - 1] != -1:
         arr_out[y - 1][x - 1] = arr_tem[y - 1][x - 1]
-    if not_out(x - 1, y) and arr_tem[y][x - 1] == 0:
+    if not_out(x - 1, y) and arr_tem[y][x - 1] != -1:
         arr_out[y][x - 1] = arr_tem[y][x - 1]
-    if not_out(x, y - 1) and arr_tem[y - 1][x] == 0:
+    if not_out(x, y - 1) and arr_tem[y - 1][x] != -1:
         arr_out[y - 1][x] = arr_tem[y - 1][x]
 
 
@@ -124,10 +126,6 @@ def play():
         os.system("pause")
         os.system("cls")
         show(arr_out)
-        print("\n\n")
-        show(arr_in)
-        print("\n\n")
-        show(arr_tem)
         ipt_x, ipt_y = input("x y:").split()
         ipt_x, ipt_y = int(ipt_x) - 1, int(ipt_y) - 1
         # ---input err---
@@ -142,6 +140,7 @@ def play():
             continue
         elif arr_in[ipt_y][ipt_x] == 1:
             print("你输了！")
+            show(arr_in)
             break
         # -------
         zk(ipt_x, ipt_y)
