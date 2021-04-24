@@ -9,6 +9,7 @@ arr_out = [["*" for i in range(N)] for i in range(N)]
 arr_in = [[0 for i in range(N)] for i in range(N)]
 arr_push = [[0 for i in range(N)] for i in range(N)]
 arr_bj = [[0 for i in range(N)] for i in range(N)]
+ENABLE_REMOUTE = False
 s = socket()
 reload = False
 
@@ -214,10 +215,10 @@ def play():
         if reload:
             break
 
-
-t = threading.Thread(target=sock)
-t.setDaemon(True)
-t.start()
+if ENABLE_REMOUTE:
+    t = threading.Thread(target=sock)
+    t.setDaemon(True)
+    t.start()
 
 init()
 # init_from_file()
