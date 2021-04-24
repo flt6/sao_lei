@@ -40,5 +40,10 @@ jobs:
     - name: test2
       run: |
          python main.py
-     
-   
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo
+        run: |
+          echo 123
+ 
