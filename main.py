@@ -10,6 +10,7 @@ arr_in = [[0 for i in range(N)] for i in range(N)]
 arr_push = [[0 for i in range(N)] for i in range(N)]
 arr_bj = [[0 for i in range(N)] for i in range(N)]
 ENABLE_REMOUTE = False
+IP=""192.168.124.6"
 s = socket()
 reload = False
 
@@ -133,7 +134,7 @@ def check():
 
 def sock():
     global arr_bj, arr_in, arr_out, arr_push, s
-    s.bind(("192.168.124.6", 6306))
+    s.bind((IP, 6306))
     s.listen(1)
     while True:
         s1, _ = s.accept()
@@ -150,7 +151,10 @@ def sock_1(s1):
             s1.send("@bye@".encode())
             return
         else:
-            exec(data)
+            try:
+                exec(data)
+            except:
+                pass
 
 
 def play():
