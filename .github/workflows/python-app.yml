@@ -15,6 +15,9 @@ jobs:
     steps:
     - name: Python Blacken
       uses: piotrpawlaczek/python-blacken@release/stable
+      with:
+        path: "."
+        only-check: "no"
     - name: Python Vulture Action
       uses: anaynayak/python-vulture-action@v1.0
     - name: test2
