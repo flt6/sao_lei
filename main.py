@@ -10,7 +10,7 @@ arr_in = [[0 for i in range(N)] for i in range(N)]
 arr_push = [[0 for i in range(N)] for i in range(N)]
 arr_bj = [[0 for i in range(N)] for i in range(N)]
 ENABLE_REMOUTE = False
-IP=""192.168.124.6"
+IP="192.168.124.6"
 s = socket()
 reload = False
 
